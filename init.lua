@@ -22,25 +22,34 @@ require("ts3init")
 require("ts3defs")
 require("ts3errors")
 
+talking = {}
+
+function setContains(set, key)
+    return set[key] ~= nil
+end
+
 function onTalkStatusChangeEvent(serverConnectionHandlerID, status, isReceivedWhisper, clientID)
 	local name = ts3.getClientVariableAsString(serverConnectionHandlerID, clientID, ts3defs.ClientProperties.CLIENT_NICKNAME)
 	local channelID = ts3.getChannelOfClient(serverConnectionHandlerID, clientID)
 	local clientList = ts3.getChannelClientList(serverConnectionHandlerID, channelID)
 	local file = io.open(os.getenv('APPDATA') .. "/TSViewer/TSViewer.txt", "w")
+	
+	talking[clientID] = status
+		
 	io.output(file)
 	
 	for i=1, #clientList do
 		local tempClientId = clientList[i]
-		local tempClientTalk = 0
-		if tempClientId == clientID then
-			tempClientTalk = status
-		else
-			tempClientTalk = ts3.getClientVariableAsString(serverConnectionHandlerID, tempClientId, ts3defs.ClientProperties.CLIENT_FLAG_TALKING)
+		local tempClientName = ts3.getClientVariableAsString(serverConnectionHandlerID, tempClientId, ts3defs.ClientProperties.CLIENT_NICKNAME)
+		local tempClientTalking = 0
+		
+		if setContains(talking, tempClientId) then
+			tempClientTalking = talking[tempClientId]
 		end
 		
-		local tempClientName = ts3.getClientVariableAsString(serverConnectionHandlerID, tempClientId, ts3defs.ClientProperties.CLIENT_NICKNAME)
-		local tempClientMuted = ts3.getClientVariableAsString(serverConnectionHandlerID, tempClientId, ts3defs.ClientProperties.CLIENT_IS_MUTED)
-		if tempClientTalk == 1 then
+		print("TestModule: tempClientId: " .. tempClientId .. " talking: " .. tempClientTalking)
+		
+		if tempClientTalking == 1 then
 			io.write("[#] " .. tempClientName .. "\n")
 		else
 			io.write("[  ] " .. tempClientName .. "\n")
