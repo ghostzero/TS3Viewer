@@ -47,8 +47,6 @@ function onTalkStatusChangeEvent(serverConnectionHandlerID, status, isReceivedWh
 			tempClientTalking = talking[tempClientId]
 		end
 		
-		print("TestModule: tempClientId: " .. tempClientId .. " talking: " .. tempClientTalking)
-		
 		if tempClientTalking == 1 then
 			io.write("[#] " .. tempClientName .. "\n")
 		else
